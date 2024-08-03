@@ -5,17 +5,18 @@ import memories from '../../images/memories.png'
 import useStyles from './style'
 import { useDispatch } from 'react-redux'
 import { useLocation } from 'react-router-dom/cjs/react-router-dom.min'
+import decode from 'jwt-decode'
 const Navbar = () => {
 
   let classes = useStyles();
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem('google-profile')));
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem('profile'))?.result);
   const history = useHistory();
   const dispatch = useDispatch();
   const location = useLocation();
 
   useEffect(() => {
     console.log(user)
-    setUser(JSON.parse(localStorage.getItem('google-profile')));
+    setUser(JSON.parse(localStorage.getItem('profile')));
   }, [])
 
   const logout = ()=>{
@@ -26,7 +27,20 @@ const Navbar = () => {
   }
 
   useEffect(() => {
-    setUser(JSON.parse(localStorage.getItem('google-profile'))); 
+    if(user){
+      console.log(user.name.charAt(0))
+    }
+  }, [user])
+  
+
+  useEffect(() => {
+    const token = user?.token;
+
+    if( token){
+      const decodedToken = decode(token);
+      if (decodedToken?.exp * 1000 < new Date().getTime()) logout();
+    }
+    setUser(JSON.parse(localStorage.getItem('profile'))?.result); 
   }, [location])
   
   
