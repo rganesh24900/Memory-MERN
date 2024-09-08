@@ -32,13 +32,14 @@ const Home = () => {
   const [search, setSearch] = useState("");
   const [tags, setTags] = useState([]);
 
-  useEffect(() => {
-    dispatch(getPosts);
-  }, [currentId, dispatch]);
+  // useEffect(() => {
+  //   dispatch(getPosts);
+  // }, [currentId, dispatch]);
 
   const searchPost = () => {
-    if (search.trim()) {
+    if (search.trim() || tags) {
         dispatch(getPostsBySearch({search,tags:tags.join(" , ")}));
+        history.push(`/posts/search?searchQuery=${search || "none"}&tags=${tags.join(" , ")}`);
     } else {
       history.push("/");
     }
@@ -79,7 +80,7 @@ const Home = () => {
                 label="Search Memories"
                 fullWidth
                 value={search}
-                onClick={(e) => setSearch(e.target.value)}
+                onChange={(e) => setSearch(e.target.value)}
                 onKeyPress={handleKeyPress}
               />
               <ChipInput
@@ -101,7 +102,7 @@ const Home = () => {
             </AppBar>
             <Form currentId={currentId} setCurrentId={setCurrentId} />
             <Paper className={classes.pagination} elevation={6}>
-              <Pagination />
+              <Pagination page={page}/>
             </Paper>
           </Grid>
         </Grid>

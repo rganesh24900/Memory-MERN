@@ -1,16 +1,16 @@
-import { FETCH_ALL,CREATE, UPDATE, DELETE, LIKE } from "../constants/actionTypes";
+import { FETCH_ALL,CREATE, UPDATE, DELETE, LIKE, FETCH_BY_SEARCH } from "../constants/actionTypes";
 
-export default (posts = [],action) => {
-    switch (action.type) {
-        case FETCH_ALL:
-            return action.payload;
-        case CREATE:
-            return [...posts,action.payload];
-        case UPDATE:
-            return posts.map(post=>post._id === action.payload._id ? action.payload : post);
-        case DELETE:
-            return posts.filter(post => post._id !== action.payload);
-        default:
-            return posts;
-    }
-}
+const handlers = {
+    [FETCH_ALL]: (posts, action) => action.payload,
+    [CREATE]: (posts, action) => [...posts, action.payload],
+    [UPDATE]: (posts, action) => posts.map(post => 
+        post._id === action.payload._id ? action.payload : post
+    ),
+    [DELETE]: (posts, action) => posts.filter(post => post._id !== action.payload),
+    [FETCH_BY_SEARCH]: (posts, action) => action.payload
+};
+
+export default (posts = [], action) => {
+    const handler = handlers[action.type] || ((posts) => posts);
+    return handler(posts, action);
+};
