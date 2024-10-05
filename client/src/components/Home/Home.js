@@ -12,7 +12,7 @@ import {
 } from "@material-ui/core";
 import { getPosts, getPostsBySearch } from "../../actions/posts";
 import Pagination from "../Pagination";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import useStyles from "./style";
 import { useHistory, useLocation } from "react-router-dom/cjs/react-router-dom";
 import ChipInput from "material-ui-chip-input";
@@ -31,6 +31,7 @@ const Home = () => {
   const searchQuery = query.get("searchQuery");
   const [search, setSearch] = useState("");
   const [tags, setTags] = useState([]);
+  const {posts} = useSelector((state)=>state.posts)
 
   // useEffect(() => {
   //   dispatch(getPosts);

@@ -6,7 +6,7 @@ export const getPosts = async (req, res) => {
     console.log("Inside get posts");
     const { page } = req.query;
     const LIMIT = 8;
-    const startIndex = Number(page) - 1 * LIMIT;
+    const startIndex = (Number(page) - 1) * LIMIT;
     const total = await PostMessage.countDocuments({});
     const posts = await PostMessage.find()
       .sort({ _id: -1 })
@@ -24,6 +24,18 @@ export const getPosts = async (req, res) => {
     res.status(404).json({ message: error });
   }
 };
+
+export const getPost = async(req,res)=>{
+  const {id} = req.params;
+
+  try{
+    const post = await PostMessage.findById(id);
+
+    res.status(200).json(post);
+  }catch(error){
+    res.status(404).json({message:error.message});
+  }
+}
 
 export const createPost = async (req, res) => {
   try {
