@@ -16,11 +16,11 @@ const App = () => {
                 <GoogleOAuthProvider clientId="272293547078-i40vakvnr1mlm6ic8p8e8mcmbb2qvina.apps.googleusercontent.com">
                     <Navbar />
                     <Switch>
-                        <Route path="/" exact component={()=><Redirect to="/posts"/>}></Route>
-                        <Route path="/posts" exact component={Home}></Route>
                         <Route path="/posts/search" exact component={Home}></Route>
-                        <Route path="/posts/:id" exact component={PostDetails}></Route>
+                        <Route path="/posts" exact component={Home}></Route>
                         <Route path="/auth" exact component={()=>(!user ? <Auth/> : <Redirect to="/posts"/>)}></Route>
+                        <Route path="/" exact component={()=><Redirect to="/posts"/>}></Route>
+                        <Route path="/posts/:id" exact component={PostDetails}></Route>
                     </Switch>
                 </GoogleOAuthProvider>
             </Container>
