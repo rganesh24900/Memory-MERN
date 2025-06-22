@@ -1,27 +1,30 @@
 import jwt from 'jsonwebtoken';
 
-const auth = (req ,res ,next)=>{
-    try{
+const auth = (req, res, next) => {
+  try {
+    const token = req.cookies?.token;
+    console.log({ ttttt: token,cook:req.cookies });
 
-        const token = req.headers.authorization && req.headers.authorization.split(" ")[1];
-        const isCustomAuth = token && token.length < 500;
-         let decodedData;
-
-         if(token && isCustomAuth){
-            decodedData = jwt.verify(token, 'test');
-
-            req.userId = decodedData?.id;
-         }
-         else{
-            decodedData = jwt.decode(token);
-            req.userId = decodedData?.sub;
-         }
-         next();
-    }
-    catch(error){
-      console.log("Error in middleware: ",error)
+    if (!token) {
+      return res.status(401).json({ message: 'Authentication failed: No token' });  // ✅ Send 401
     }
 
-}
+    const isCustomAuth = token.length < 500;
+    let decodedData;
+
+    if (isCustomAuth) {
+      decodedData = jwt.verify(token, 'test');
+      req.userId = decodedData?.id;
+    } else {
+      decodedData = jwt.decode(token);
+      req.userId = decodedData?.sub;
+    }
+
+    next();  // ✅ Proceed if auth is valid
+  } catch (error) {
+    console.trace('Error in middleware: ', error);
+    return res.status(401).json({ message: 'Authentication failed' });  // ✅ Respond and stop
+  }
+};
 
 export default auth;

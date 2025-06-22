@@ -1,50 +1,73 @@
-import bcrypt from'bcryptjs'
-import jwt from 'jsonwebtoken'
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
+import User from '../models/userMessage.js';
 
-import User from '../models/userMessage.js'
+export const signin = async (req, res) => {
+  const { email, password } = req.body;
 
+  try {
+    const existingser = await User.findOne({ email });
 
-export const signin = async(req,res)=>{
-    const {email,password} = req.body;
+    if (!existingser)
+      return res.status(404).json({ message: "User doesn't Exist" });
 
-    try {
-        const existingser = await User.findOne({email});
+    const isPasswordCorrect = await bcrypt.compare(
+      password,
+      existingser.password
+    );
+    if (!isPasswordCorrect)
+      return res.status(400).json({ message: 'Invalid Credentials' });
 
-        if(!existingser) return res.status(404).json({message:"User doesn't Exist"});
+    const token = jwt.sign(
+      { email: existingser.email, id: existingser._id },
+      'test',
+      { expiresIn: '1h' }
+    );
+    res.cookie('token', token, {
+      httpOnly: true, // Cannot be accessed by JS (XSS protection)
+      secure: true, // Sent only over HTTPS
+      sameSite: 'Strict', // Prevent CSRF (or 'Lax' for more relaxed use)
+      maxAge: 60 * 60 * 1000, // 1 hour in milliseconds
+    });
 
-        const isPasswordCorrect = await bcrypt.compare(password, existingser.password);
-        if(!isPasswordCorrect) return res.status(400).json({message:"Invalid Credentials"});
+    return res.status(200).json({ result: existingser });
+  } catch (error) {
+    return res.status(500).json({ message: 'Something went wrong.' });
+  }
+};
 
-        const token = jwt.sign({email:existingser.email, id:existingser._id}, 'test' ,{expiresIn:"1h"});
+export const signup = async (req, res) => {
+  const { name, email, password, confirmPassword, firstName, lastName } =
+    req.body;
 
-        res.status(200).json({result:existingser , token});
-    } catch (error) {
-        res.status(500).json({message:"Something went wrong."})
-    }
-}
+  try {
+    const existingser = await User.findOne({ email });
 
-export const signup = async(req,res)=> {
+    if (existingser)
+      return res.status(400).json({ message: 'User already Exists' });
 
-    const {name,email,password,confirmPassword,firstName,lastName} = req.body;
+    if (password !== confirmPassword)
+      return res.status(400).json({ message: "Passwords don't match" });
 
-    try{
-        const existingser = await User.findOne({email});
+    const hashedPasswd = String(await bcrypt.hash(password, 12));
 
-        if(existingser) return res.status(400).json({message:"User already Exists"});
+    const result = await User.create({
+      email,
+      password: hashedPasswd,
+      name: `${firstName} ${lastName}`,
+    });
+    console.log('result ,', result);
 
-        if(password !== confirmPassword) return res.status(400).json({message:"Passwords don't match"});
+    const token = jwt.sign({ email: result.email, id: result._id });
 
-        const hashedPasswd = String(await bcrypt.hash(password,12));
+    res.cookie('token', token, {
+      httpOnly: true, // Cannot be accessed by JS (XSS protection)
+      secure: true, // Sent only over HTTPS
+      sameSite: 'Strict', // Prevent CSRF (or 'Lax' for more relaxed use)
+      maxAge: 60 * 60 * 1000, // 1 hour in milliseconds
+    });
 
-        const result = await User.create({email,password:hashedPasswd,name: `${firstName} ${lastName}`})
-        console.log("result ,",result)
-
-        const token = jwt.sign({email: result.email , id:result._id})
-
-        res.status(200).json({result , token});
-    }
-    catch(error){
-
-    }
-}
+    res.status(200).json({ result });
+  } catch (error) {}
+};

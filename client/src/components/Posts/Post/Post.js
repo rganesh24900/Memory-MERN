@@ -6,14 +6,14 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 import moment from 'moment'
 import { deletePost, likePost } from '../../../actions/posts';
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import ThumbUpAltOutlined from '@material-ui/icons/ThumbUpAlt';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom';
 
 const Post = ({ post, setCurrentId }) => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const user = JSON.parse(localStorage.getItem('profile'));
+  const user =  useSelector(state=>state?.auth.authData);
   const history = useHistory()
   const Likes =()=>{
     if(post?.likes?.length){

@@ -1,14 +1,14 @@
 import axios from 'axios';
 
-const API = axios.create({baseURL:'http://localhost:5000'});
+const API = axios.create({baseURL:'http://localhost:5000',withCredentials: true, });
 // const url = 'http://localhost:5000/posts';
 
-API.interceptors.request.use((req)=>{
-    if(localStorage.getItem('profile')){
-        req.headers.Authorization = `Bearer ${JSON.parse(localStorage.getItem('profile')).token}`;
-    }
-    return req;
-})
+// API.interceptors.request.use((req)=>{
+//     if(localStorage.getItem('profile')){
+        
+//     }
+//     return req;
+// })
 
 export const fetchPosts = (page) => API.get(`/posts?page=${page}`);
 export const fetchPost = (id) => API.get(`/posts/${id}`);

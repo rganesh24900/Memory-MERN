@@ -6,10 +6,12 @@ import Home from "./components/Home/Home";
 import Auth from "./components/Auth/Auth";
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import PostDetails from "./components/PostDetails/PostDetails";
+import { useSelector } from "react-redux";
 
 
 const App = () => {
-    const user = JSON.parse(localStorage.getItem('profile'))
+    const user = useSelector(state=>state?.auth.authData);
+    console.log({user})
     return (
         <BrowserRouter>
             <Container maxWidth="xl">

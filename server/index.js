@@ -5,12 +5,18 @@ import mongoose from 'mongoose'
 import postRoutes from './routes/posts.js'
 import userRoutes from './routes/users.js'
 import dotenv from 'dotenv'
+import cookieParser from 'cookie-parser'
 
 const app = express();
 dotenv.config();
+app.use(cookieParser());
 app.use(bodyParser.json({limit:"30mb",extended:true}));
 app.use(bodyParser.urlencoded({limit:"30mb",extended:true}));
-app.use(cors());
+
+app.use(cors({
+  origin: 'http://localhost:3000',  // ✅ Replace with your React app URL
+  credentials: true,                // ✅ Allow cookies
+}));
 app.use('/posts',postRoutes);
 app.use('/users',userRoutes);
 
